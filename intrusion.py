@@ -3,7 +3,7 @@ import random
 import uuid
 
 maxZoom = 6
-tileServerUrl = "http://37.46.17.101:9091/TileProxy"
+tileServerUrl = "http://localhost:5279/TileProxy"
 sessionId = uuid.uuid5(uuid.NAMESPACE_DNS, 'intruder_basic_bulk_download')
 downloadFolder = "DownloadedTiles"
 
@@ -29,6 +29,7 @@ def randomBulkDownload(zoom: int, leftXTileIndex: int, rightXTileIndex:int, uppe
     alreadySent = set()
 
     tilesCount = 2**(2*zoom)
+
     while tilesCount > 0:
         x: int = random.randint(leftXTileIndex, rightXTileIndex)
         y: int = random.randint(upperYTileIndex, downYTileIndex)
@@ -45,4 +46,4 @@ def randomBulkDownload(zoom: int, leftXTileIndex: int, rightXTileIndex:int, uppe
 if __name__ == '__main__':
     sessionId = uuid.uuid5(uuid.NAMESPACE_DNS, 'intruder_random_bulk_download_zoom_11')
     print(sessionId)
-    randomBulkDownload(11, 500, 800, 20, 320)
+    randomBulkDownload(2, 500, 800, 20, 320)

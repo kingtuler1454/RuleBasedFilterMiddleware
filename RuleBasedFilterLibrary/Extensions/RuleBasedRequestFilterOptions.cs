@@ -1,4 +1,4 @@
-﻿using RuleBasedFilterLibrary.Core.Model.Requests;
+using RuleBasedFilterLibrary.Core.Model.Requests;
 
 namespace RuleBasedFilterLibrary.Extensions;
 
@@ -8,6 +8,13 @@ public class RuleBasedRequestFilterOptions
     public bool EnableRequestSequenceValidation { get; set; } = false;
     public string NodeAddress { get; set; } = "http://localhost:9200";
     public string IndexName { get; set; } = "requests";
+
+    public string? OpenSearchUsername { get; set; }
+
+    public string? OpenSearchPassword { get; set; }
+
+
+    public bool OpenSearchSkipServerCertificateValidation { get; set; }
     public int MaxNumberOfRecentRequests { get; set; } = 20;
     public int MinLengthOfAnalyzedSequence { get; set; } = 10;
 

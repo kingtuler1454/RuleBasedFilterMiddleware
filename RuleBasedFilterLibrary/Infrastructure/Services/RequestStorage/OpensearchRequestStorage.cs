@@ -1,4 +1,4 @@
-﻿using OpenSearch.Client;
+using OpenSearch.Client;
 using RuleBasedFilterLibrary.Core.Model.Requests;
 using RuleBasedFilterLibrary.Extensions;
 
@@ -11,8 +11,7 @@ public class OpensearchRequestStorage : IRequestStorage
 
     public OpensearchRequestStorage(RuleBasedRequestFilterOptions options)
     {
-        var nodeAddress = new Uri(options.NodeAddress);
-        var config = new ConnectionSettings(nodeAddress).DefaultIndex(options.IndexName);
+        var config = OpenSearchConnectionSettingsFactory.Create(options);
 
         _openSearchClient = new OpenSearchClient(config);
         _options = options;

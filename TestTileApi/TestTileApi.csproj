@@ -8,6 +8,7 @@
     <UserSecretsId>7afcd106-1555-495a-9017-193e77a67e19</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..</DockerfileContext>
+    <PackageProjectUrl>http://localhost:5279</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>

@@ -13,11 +13,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
 
-var options = new RuleBasedRequestFilterOptions
-{
-    EnableRequestSequenceValidation = true,
-    OnViolationAction = OnViolationHandler.OnViolationAction
-};
+var options = new RuleBasedRequestFilterOptions();
+builder.Configuration.GetSection("RuleBasedFilter").Bind(options);
+options.EnableRequestSequenceValidation = true;
+options.OnViolationAction = OnViolationHandler.CreateClearIndexHandler(options);
 
 builder.Services
     .AddRuleBasedRequestFilterServices(options)
@@ -36,7 +35,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseRuleBasedFilter();
-app.UseHttpsRedirection();
+// иначе Leaflet получает 307 на каждый тайл (mixed / сертификат).
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.UseAuthorization();
 app.MapControllers();
 

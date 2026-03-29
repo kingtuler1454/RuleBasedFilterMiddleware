@@ -1,18 +1,18 @@
-﻿using OpenSearch.Client;
+using OpenSearch.Client;
 using RuleBasedFilterLibrary.Core.Model.Requests;
+using RuleBasedFilterLibrary.Extensions;
+using RuleBasedFilterLibrary.Infrastructure.Services.RequestStorage;
 
 namespace TestTileApi.Utils;
 
 public static class OnViolationHandler
 {
-    public static async Task OnViolationAction(Request request)
-    {
-        var nodeAddress = new Uri("http://localhost:9200");
-        var config = new ConnectionSettings(nodeAddress).DefaultIndex("requests");
-
-        var openSearchClient = new OpenSearchClient(config);
-
-        var deleteRequest = new DeleteIndexRequest(Indices.Parse("requests"));
-        await openSearchClient.Indices.DeleteAsync(deleteRequest);
-    }
+    public static Func<Request, Task> CreateClearIndexHandler(RuleBasedRequestFilterOptions options) =>
+        async _ =>
+        {
+            var config = OpenSearchConnectionSettingsFactory.Create(options);
+            var client = new OpenSearchClient(config);
+            var deleteRequest = new DeleteIndexRequest(Indices.Parse(options.IndexName));
+            await client.Indices.DeleteAsync(deleteRequest);
+        };
 }
