@@ -363,3 +363,10 @@ MigrationBackup/
 FodyWeavers.xsd
 /TestTileServer/TileServerApi/Data/Tiles
 /TestTileServer/Data/Tiles
+WORKLOG.md
+export_opensearch_requests.py
+export_opensearch_requests.py
+requests_raw2.json
+requests_raw.json
+export_opensearch_requests.py
+requests_synthetic.json
