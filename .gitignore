@@ -370,3 +370,16 @@ requests_raw2.json
 requests_raw.json
 export_opensearch_requests.py
 requests_synthetic.json
+.idea/НИРС.iml
+.idea/misc.xml
+.idea/.name
+.idea/modules.xml
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/vcs.xml
+.idea/inspectionProfiles/Project_Default.xml
+data/processed/experiments_iforest.csv
+data/processed/plots/iforest_classification_report.txt
+data/processed/plots/iforest_pr.png
+data/processed/plots/iforest_roc.png
+data/processed/plots/iforest_run_meta.json
+data/processed/plots/iforest_score_hist.png
