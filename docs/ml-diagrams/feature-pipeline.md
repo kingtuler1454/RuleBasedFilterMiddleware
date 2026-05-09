@@ -91,7 +91,7 @@ flowchart LR
     C --> D{"Модель"}
     D --> D1["Isolation Forest<br/>ансамбль iTree → score"]
     D --> D2["One-Class SVM (RBF)<br/>Σ αᵢ K(x, xᵢ) − ρ"]
-    D --> D3["LOF (k=35)<br/>locаl density ratio"]
+    D --> D3["LOF (k=35)<br/>local density ratio"]
     D1 --> E["anomaly_score, predict ∈ {−1, +1}"]
     D2 --> E
     D3 --> E
