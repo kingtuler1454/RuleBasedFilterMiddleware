@@ -1,11 +1,11 @@
-# C4 Level 2 — Container Diagram: C# Solution
+# C4 Level 2 — Container Diagram: Cs Solution
 
 Показывает контейнеры .NET-решения `YmlRulesFileParser.sln` и их взаимодействие
 с внешними системами.
 
 ```mermaid
 C4Container
-    title C4 Level 2 — Containers: C#-решение RuleBasedFilterMiddleware
+    title C4 Level 2 — Containers: Cs-решение RuleBasedFilterMiddleware
 
     Person(webClient, "Web Client", "Браузер / HTTP-клиент.<br/>Запрашивает тайловые изображения<br/>через client.html")
 
