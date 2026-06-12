@@ -1,50 +1,54 @@
-# C4 Level 2 — Container Diagram: Cs Solution
+# C4 Level 2 — Container Diagram: C# Solution
 
 Показывает контейнеры .NET-решения `YmlRulesFileParser.sln` и их взаимодействие
 с внешними системами.
 
 ```mermaid
-C4Container
-    title C4 Level 2 — Containers: Cs-решение RuleBasedFilterMiddleware
+flowchart TD
+    classDef person   fill:#08427b,color:#fff,stroke:#073b6f,rx:50
+    classDef container fill:#1168bd,color:#fff,stroke:#0b4f9a
+    classDef ext      fill:#6b6b6b,color:#fff,stroke:#555
+    classDef db       fill:#6b6b6b,color:#fff,stroke:#555
 
-    Person(webClient, "Web Client", "Браузер / HTTP-клиент.<br/>Запрашивает тайловые изображения<br/>через client.html")
+    WebClient(["👤 Web Client\n─────────────\nБраузер / HTTP-клиент"]):::person
 
-    System_Ext(mapTiler, "MapTiler API", "Внешний тайловый сервер.<br/>api.maptiler.com<br/>GET /maps/openstreetmap/256/{z}/{x}/{y}.png")
-    System_Ext(mlService, "ML Service", "Python FastAPI, порт 8000.<br/>POST /predict — онлайн-инференс<br/>модели обнаружения аномалий")
-    SystemDb_Ext(openSearch, "OpenSearch", "Хранилище истории запросов.<br/>Индекс 'requests'. HTTPS:9200")
+    subgraph Solution["⬜ YmlRulesFileParser.sln  ·  .NET"]
+        direction TB
 
-    System_Boundary(solution, "YmlRulesFileParser.sln (.NET)") {
+        subgraph Apps["Приложения"]
+            direction LR
+            TileApi["🟦 TestTileApi\n─────────────\nASP.NET Core Web API\nПрокси тайлового сервера"]:::container
+            WebApp["🟦 TestWebApplication\n─────────────\nASP.NET Core Web API\nТестовое приложение"]:::container
+        end
 
-        Container_Boundary(tileApiBoundary, "TestTileApi") {
-            Container(tileApi, "TestTileApi", "ASP.NET Core Web API, C#", "Прокси-сервер тайлов.<br/>Принимает GET /Tiles?z&x&y,<br/>проксирует запрос к MapTiler,<br/>защищён фильтрующим middleware.")
-        }
+        subgraph Library["RuleBasedFilterLibrary  ·  NuGet"]
+            direction LR
+            MW["🟦 Middleware\n─────────────\nПерехват запросов\nHTTP 403 при нарушении"]:::container
+            Core["🟦 Core\n─────────────\nДоменная логика:\nправила, политики,\nанализ последовательностей"]:::container
+            Infra["🟦 Infrastructure\n─────────────\nOpenSearch-адаптер\nYAML-парсер правил"]:::container
+            Ext["🟦 Extensions\n─────────────\nDI-регистрация\nсервисов и middleware"]:::container
+        end
+    end
 
-        Container_Boundary(webAppBoundary, "TestWebApplication") {
-            Container(webApp, "TestWebApplication", "ASP.NET Core Web API, C#", "Тестовое веб-приложение.<br/>Демонстрирует базовое<br/>правило-ориентированное<br/>фильтрование запросов.")
-        }
+    MapTiler["🗺 MapTiler API\n─────────────\nВнешний тайловый сервер\napi.maptiler.com"]:::ext
+    MLSvc["🤖 ML Service\n─────────────\nPython FastAPI :8000\nПредсказание аномалий"]:::ext
+    OpenSearch[("🗄 OpenSearch\n─────────────\nИндекс 'requests'\nИстория запросов")]:::db
 
-        Container_Boundary(libBoundary, "RuleBasedFilterLibrary (NuGet)") {
-            Container(middleware, "Middleware", ".NET, ASP.NET Core", "RuleBasedRequestFilterMiddleware.<br/>Перехватывает каждый HTTP-запрос,<br/>возвращает 403 при нарушении правил.")
-            Container(core, "Core", ".NET, C#", "Доменные модели и сервисы:<br/>правила (Rules), политики доступа<br/>(AccessPolicies), анализ<br/>последовательностей запросов<br/>(SequenceAnalysis), фабрики.")
-            Container(infrastructure, "Infrastructure", ".NET, C#", "Инфраструктурные сервисы:<br/>OpensearchRequestStorage — чтение/<br/>запись истории запросов,<br/>RulesLoader — парсинг rulesConf.yml.")
-            Container(extensions, "Extensions", ".NET, C#", "DI-расширения: регистрация<br/>сервисов, middleware и<br/>настроек фильтра.")
-        }
-    }
+    %% ── внешние входы ──
+    WebClient -- "GET /Tiles?z&x&y" --> TileApi
+    WebClient -- "HTTP-запросы" --> WebApp
 
-    Rel(webClient, tileApi, "GET /Tiles?z&x&y", "HTTP/HTTPS")
-    Rel(webClient, webApp, "HTTP-запросы для тестирования", "HTTP/HTTPS")
+    %% ── in-process зависимости ──
+    TileApi --> MW
+    WebApp  --> MW
+    MW      --> Core
+    Core    --> Infra
+    Core    --> Ext
 
-    Rel(tileApi, middleware, "использует (in-process)")
-    Rel(webApp, middleware, "использует (in-process)")
-    Rel(middleware, core, "вызывает IRequestValidationService")
-    Rel(core, infrastructure, "читает историю запросов<br/>через IRequestStorage")
-    Rel(core, extensions, "конфигурируется через DI")
-
-    Rel(tileApi, mapTiler, "GET /256/{z}/{x}/{y}.png", "HTTPS")
-    Rel(infrastructure, openSearch, "GetRequestsOfUser / AddAsync", "HTTPS, opensearch-client")
-    Rel(tileApi, mlService, "POST /predict<br/>(MLSequenceAnalyzer)", "HTTP/JSON")
-
-    Rel(infrastructure, core, "поставляет модели запросов")
+    %% ── внешние вызовы ──
+    TileApi  -- "GET тайл\nHTTPS" --> MapTiler
+    TileApi  -- "POST /predict\nHTTP/JSON" --> MLSvc
+    Infra    -- "search / index\nHTTPS" --> OpenSearch
 ```
 
 ## Легенда контейнеров
