@@ -383,3 +383,6 @@ data/processed/plots/iforest_pr.png
 data/processed/plots/iforest_roc.png
 data/processed/plots/iforest_run_meta.json
 data/processed/plots/iforest_score_hist.png
+scripts/.env
+.vscode/settings.json
+.idea/DIPLOM.iml
