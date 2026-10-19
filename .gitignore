@@ -386,3 +386,7 @@ data/processed/plots/iforest_score_hist.png
 scripts/.env
 .vscode/settings.json
 .idea/DIPLOM.iml
+scripts/tmp_files/requests_merged_labeled.csv
+scripts/tmp_files/requests_raw_clean.csv
+scripts/tmp_files/requests_raw_clean.json
+scripts/tmp_files/requests_raw_synthetic.json
