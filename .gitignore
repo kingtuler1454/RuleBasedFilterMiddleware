@@ -363,3 +363,6 @@ MigrationBackup/
 FodyWeavers.xsd
 /TestTileServer/TileServerApi/Data/Tiles
 /TestTileServer/Data/Tiles
+
+# Артефакты экспериментов (кеши окон, OOF-оценки, отчёты)
+tmp_files/
