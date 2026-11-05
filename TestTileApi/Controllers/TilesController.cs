@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using OpenSearch.Client;
+using RuleBasedFilterLibrary.Extensions;
+using RuleBasedFilterLibrary.Infrastructure.Services.RequestStorage;
 
 namespace TestTileApi.Controllers;
 
@@ -9,7 +11,11 @@ namespace TestTileApi.Controllers;
 /// <param name="tileRepository">Сервис работы с тайлами</param>
 [ApiController]
 [Route("[controller]")]
-public class TilesController(IHttpClientFactory httpClientFactory, IConfiguration configuration, ILogger<TilesController> logger) : ControllerBase
+public class TilesController(
+    IHttpClientFactory httpClientFactory,
+    IConfiguration configuration,
+    RuleBasedRequestFilterOptions openSearchOptions,
+    ILogger<TilesController> logger) : ControllerBase
 {
     private readonly string _tileServerDomain = configuration["TileSourceConfiguration:TileSource"] ??
         throw new ArgumentNullException("Not found TileSourceConfiguration:TileSource section");
@@ -25,22 +31,36 @@ public class TilesController(IHttpClientFactory httpClientFactory, IConfiguratio
     /// <param name="y">Координата y</param>
     /// <returns>Изображение тайла</returns>
     [HttpGet]
+    //public async Task<ActionResult> GetTile(int z, int x, int y)
+    //{
+    //    logger.LogInformation($"Tile {z} {x} {y}");
+    //    // Do nothing while testing
+    //    return await Task.FromResult(Ok());
+    //}
+    [HttpGet]
     public async Task<ActionResult> GetTile(int z, int x, int y)
     {
-        logger.LogInformation($"Tile {z} {x} {y}");
-        // Do nothing while testing
-        return await Task.FromResult(Ok());
+        logger.LogInformation("Tile {Z} {X} {Y}", z, x, y);
+
+        var url = $"{_tileServerDomain}/256/{z}/{x}/{y}.png?key={_tileServerApiKey}";
+
+        var client = httpClientFactory.CreateClient();
+        var response = await client.GetAsync(url);
+
+        if (!response.IsSuccessStatusCode)
+            return StatusCode((int)response.StatusCode);
+
+        var bytes = await response.Content.ReadAsByteArrayAsync();
+        return File(bytes, "image/png");
     }
 
     [HttpGet("clear")]
     public async Task<ActionResult> ClearOpenSearchIndex()
     {
-        var nodeAddress = new Uri("http://localhost:9200");
-        var config = new ConnectionSettings(nodeAddress).DefaultIndex("requests");
-
+        var config = OpenSearchConnectionSettingsFactory.Create(openSearchOptions);
         var openSearchClient = new OpenSearchClient(config);
 
-        var deleteRequest = new DeleteIndexRequest(Indices.Parse("requests"));
+        var deleteRequest = new DeleteIndexRequest(Indices.Parse(openSearchOptions.IndexName));
         await openSearchClient.Indices.DeleteAsync(deleteRequest);
 
         logger.LogInformation("Clear");
